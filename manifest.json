@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "DiscoverySurvey admin panel theme plugin",
+  "version": "0.2.2",
+  "description": "Custom theme changer for DiscoverySurvey admin panel",
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["https://discovery-survey.com/index.php/*"],
+      "js": ["content.js"],
+      "css": ["early.css"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["img/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

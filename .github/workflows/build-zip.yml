@@ -1,0 +1,26 @@
+name: Release Chrome Extension ZIP
+
+on:
+  push:
+    branches: ["master"]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: ./build.sh
+
+      - name: Create tag name
+        id: tag
+        run: echo "TAG=build-$(date +%Y%m%d-%H%M%S)" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.TAG }}
+          name: ${{ steps.tag.outputs.TAG }}
+          files: dist/*.zip

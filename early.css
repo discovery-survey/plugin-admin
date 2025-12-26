@@ -1,0 +1,21 @@
+/* early.css */
+
+/* скрываем лого только до замены */
+nav.navbar a.navbar-brand img.d-inline-block.align-bottom:not([data-ds-ready="1"]) {
+    visibility: hidden !important;
+}
+
+/* Donate + Help можно оставлять как было */
+#donate-button,
+#help-button-dropup {
+    display: none !important;
+}
+
+/* community скрываем только до замены */
+footer.footer a[href^="https://community.limesurvey.org"]:not([data-ds-ready="1"]) {
+    visibility: hidden !important;
+}
+
+a#helpDropdown {
+    display: none !important;
+}
