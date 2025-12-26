@@ -12,7 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: ./build.sh
+      - name: Build zip
+        run: |
+          chmod +x build.sh
+          ./build.sh
 
       - name: Create tag name
         id: tag
