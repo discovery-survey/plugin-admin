@@ -25,9 +25,18 @@ echo "Built: $DIST_DIR/${EXT_NAME}.zip"
 
 cd ..
 if [ -d "themes/admin" ]; then
-  # заходим в `themes`, создаём архив и записываем его в проектную папку `dist` (../dist из `themes`)
-  (cd themes && zip -r "../$DIST_DIR/${THEME_NAME}.zip" admin)
-  echo "Built: $DIST_DIR/${THEME_NAME}.zip"
+  built=false
+  for d in themes/admin/*; do
+    if [ -d "$d" ]; then
+      name=$(basename "$d")
+      (cd themes && zip -r "../$DIST_DIR/admin_theme_${name}.zip" "admin/${name}")
+      echo "Built: $DIST_DIR/admin_theme_${name}.zip"
+      built=true
+    fi
+  done
+  if [ "$built" = false ]; then
+    echo "Skipping: no subdirectories found in themes/admin/"
+  fi
 else
   echo "Skipping: themes/admin/ not found"
 fi
