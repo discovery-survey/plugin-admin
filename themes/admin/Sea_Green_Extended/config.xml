@@ -27,7 +27,9 @@
             <filename>sea_green.css</filename>
         </css>
 
-        <js></js>
+        <js>
+            <filename>extra.js</filename>
+        </js>
 
         <!--
             Those files will be loaded for right to left languages only
