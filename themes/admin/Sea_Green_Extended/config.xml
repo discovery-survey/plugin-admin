@@ -11,7 +11,7 @@
         <version>3.0</version>
         <description>A Sea Green themed admin template with extended features.</description>
         <basecolor>#328637</basecolor>
-        <lastUpdate>2026-23-01 17:00:00</lastUpdate>
+        <lastUpdate>2026-04-02 17:00:00</lastUpdate>
     </metadata>
 
     <compatibility>
@@ -28,7 +28,7 @@
         </css>
 
         <js>
-            <filename>extra.js</filename>
+            <filename>extra.js?v=20260204-1</filename>
         </js>
 
         <!--

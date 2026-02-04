@@ -2,7 +2,6 @@
 set -euo pipefail
 
 EXT_NAME="chrome-extension"
-THEME_NAME="theme-admin"
 DIST_DIR="dist"
 
 rm -rf "$DIST_DIR"
