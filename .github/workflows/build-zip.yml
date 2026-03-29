@@ -1,4 +1,4 @@
-name: Release Chrome Extension ZIP
+name: Release Extensions
 
 on:
   push:

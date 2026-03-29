@@ -45,7 +45,7 @@ if [ -d "plugins" ]; then
   for d in plugins/*; do
     if [ -d "$d" ]; then
       name=$(basename "$d")
-      zip -r "$DIST_DIR/${name}.zip" "$d" -x "*.DS_Store*"
+      (cd plugins && zip -r "../$DIST_DIR/${name}.zip" "$name" -x "*.DS_Store*")
       echo "Built: $DIST_DIR/${name}.zip"
       built=true
     fi
