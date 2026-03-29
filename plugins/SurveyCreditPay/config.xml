@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+  <metadata>
+    <name>SurveyCreditPay</name>
+    <type>plugin</type>
+    <creationDate>2026-03-29</creationDate>
+    <lastUpdate>2026-03-29</lastUpdate>
+    <author>Valentin Nikolaev</author>
+    <authorUrl>https://github.com/ValentinNikolaev</authorUrl>
+    <version>1.0.0</version>
+    <license>GNU General Public License version 2 or later</license>
+    <description><![CDATA[Calls an external credit API on survey complete or quota screenout, with per-survey rewards and optional redirect.]]></description>
+  </metadata>
+  <compatibility>
+    <version>6.0</version>
+    <version>5.0</version>
+  </compatibility>
+  <updaters disabled="disabled">
+  </updaters>
+</config>

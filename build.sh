@@ -39,3 +39,20 @@ if [ -d "themes/admin" ]; then
 else
   echo "Skipping: themes/admin/ not found"
 fi
+
+if [ -d "plugins" ]; then
+  built=false
+  for d in plugins/*; do
+    if [ -d "$d" ]; then
+      name=$(basename "$d")
+      (cd themes && zip -r "../$DIST_DIR/${name}.zip" "plugins/${name}")
+      echo "Built: $DIST_DIR/${name}.zip"
+      built=true
+    fi
+  done
+  if [ "$built" = false ]; then
+    echo "Skipping: no subdirectories found in plugins"
+  fi
+else
+  echo "Skipping: plugins not found"
+fi
