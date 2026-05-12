@@ -23,8 +23,8 @@ class SurveyCreditPay extends PluginBase
 {
     protected $storage = 'DbStorage';
 
-    protected static string $name = 'SurveyCreditPay';
-    protected static string $description = 'Credits participants on complete or screenout and can redirect to an external link.';
+    protected static  $name = 'SurveyCreditPay';
+    protected static  $description = 'Credits participants on complete or screenout and can redirect to an external link.';
 
     /** @var array<string,mixed> */
     protected $settings = [
