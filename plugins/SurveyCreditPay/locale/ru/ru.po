@@ -68,7 +68,7 @@ msgid "Numeric amount to send as result for quota screenouts."
 msgstr "Числовое значение, которое будет отправлено как результат для quota screenout."
 
 msgid "Enable credit callback"
-msgstr "Включить callback начисления вознаграждения"
+msgstr "Включить начисление вознаграждения"
 
 msgid "Disabled"
 msgstr "Выключено"

@@ -8,6 +8,8 @@
  *
  */
 
+use Relay\Event;
+
 /**
  *
  * @method get($key = null, $model = null, $id = null, $default = null):boolean
@@ -100,6 +102,16 @@ class SurveyCreditPay extends PluginBase
                     'type' => 'info',
                     'content' => $this->gT('Configure the reward amounts and callback behavior for this survey. The API URL and key are set in the global plugin settings.'),
                 ],
+                'credit_enabled' => [
+                    'type' => 'select',
+                    'label' => $this->gT('Enable credit callback'),
+                    'current' => (string) $this->get('credit_enabled', 'Survey', $surveyId, '0'),
+                    'default' => '0',
+                    'options' => [
+                        '0' => $this->gT('Disabled'),
+                        '1' => $this->gT('Enabled',)
+                    ],
+                ],
                 'api_settings' => [
                     'type' => 'info',
                     'content' => sprintf('Url: %s<br>Key: %s', CHtml::encode($this->get('api_url', null, null, self::DEFAULT_API_URL)), str_repeat('*', max(8, strlen($this->get('api_key', null, null, self::DEFAULT_API_KEY))))),
@@ -122,27 +134,6 @@ class SurveyCreditPay extends PluginBase
                         'placeholder' => '5',
                     ],
                 ],
-                'credit_enabled' => [
-                    'type' => 'select',
-                    'label' => $this->gT('Enable credit callback'),
-                    'current' => (string) $this->get('credit_enabled', 'Survey', $surveyId, '0'),
-                    'default' => '0',
-                    'options' => [
-                        '0' => $this->gT('Disabled'),
-                        '1' => $this->gT('Enabled',)
-                    ],
-                ],
-                'credit_use_api_redirect' => [
-                    'type' => 'select',
-                    'label' => $this->gT('Use redirect link from external API'),
-                    'current' => (string) $this->get('credit_use_api_redirect', 'Survey', $surveyId, '0'),
-                    'default' => '0',
-                    'options' => [
-                        '0' => $this->gT('No'),
-                        '1' => $this->gT('Yes'),
-                    ],
-                    'help' => $this->gT('If enabled and the API returns a non-empty link, the participant will be redirected there.'),
-                ],
             ],
         ]);
     }
@@ -157,10 +148,9 @@ class SurveyCreditPay extends PluginBase
         $settings = (array) $event->get('settings');
 
         $keys = [
+            'credit_enabled',
             'credit_completed_amount',
             'credit_screenout_amount',
-            'credit_enabled',
-            'credit_use_api_redirect',
         ];
 
         foreach ($keys as $key) {
@@ -183,7 +173,7 @@ class SurveyCreditPay extends PluginBase
         try {
             $this->processOutcome($reason);
         } catch (Throwable $e) {
-            $this->log(sprintf('Fatal error while processing %s: %s', $reason, $e->getMessage()), \CLogger::LEVEL_ERROR);
+            $this->logPlugin("outcome", sprintf('Fatal error while processing %s: %s', $reason, $e->getMessage()), \CLogger::LEVEL_ERROR);
             $this->appendUserWarning($this->buildUserErrorMessage($e->getMessage()));
         }
     }
@@ -195,17 +185,19 @@ class SurveyCreditPay extends PluginBase
         $responseId = $this->resolveResponseIdFromEvent($event);
 
         if ($surveyId <= 0 || !$this->isEnabledForSurvey($surveyId)) {
+            $this->logPlugin($surveyId, sprintf('Skipping callback because plugin is disabled for this survey. survey=%d reason=%s', $surveyId, $reason));
             return;
         }
 
         if ($this->wasAlreadyProcessed($surveyId, $responseId, $reason)) {
-            $this->log(sprintf('Skipping duplicate callback. survey=%d response=%d reason=%s', $surveyId, $responseId, $reason));
+            $this->logPlugin($surveyId, sprintf('Skipping duplicate callback. survey=%d response=%d reason=%s', $surveyId, $responseId, $reason));
             return;
         }
 
         $amount = $this->getAmountForReason($surveyId, $reason);
         if ($amount === null) {
             $this->appendUserWarning($this->buildUserErrorMessage($this->gT('invalid reward amount in plugin settings')));
+            $this->logPlugin($surveyId, sprintf('Invalid reward amount in settings. survey=%d reason=%s', $surveyId, $reason), \CLogger::LEVEL_ERROR);
             return;
         }
 
@@ -219,7 +211,8 @@ class SurveyCreditPay extends PluginBase
 
         $apiResult = $this->callCreditApi($payload);
         if (!$apiResult['ok']) {
-            $this->log(
+            $this->logPlugin(
+                $surveyId.":".$responseId,
                 sprintf(
                     'Credit API error. survey=%d response=%d reason=%s error=%s',
                     $surveyId,
@@ -234,9 +227,11 @@ class SurveyCreditPay extends PluginBase
             return;
         }
 
+        $this->logPlugin($surveyId, sprintf('Credit API call successful. survey=%d response=%d reason=%s amount=%s', $surveyId, $responseId, $reason, $amount));
         $this->markProcessed($surveyId, $responseId, $reason);
 
-        $this->log(
+        $this->logPlugin(
+            $surveyId.":".$responseId,
             sprintf(
                 'Credit callback success. survey=%d response=%d reason=%s payload=%s response=%s',
                 $surveyId,
@@ -246,10 +241,6 @@ class SurveyCreditPay extends PluginBase
                 json_encode($apiResult['data'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
             )
         );
-
-        if (!$this->shouldUseApiRedirect($surveyId)) {
-            return;
-        }
 
         $redirectUrl = $this->sanitizeRedirectUrl((string) ($apiResult['data']['link'] ?? ''));
         if ($redirectUrl === null) {
@@ -262,11 +253,6 @@ class SurveyCreditPay extends PluginBase
     private function isEnabledForSurvey(int $surveyId): bool
     {
         return (string) $this->get('credit_enabled', 'Survey', $surveyId, '0') === '1';
-    }
-
-    private function shouldUseApiRedirect(int $surveyId): bool
-    {
-        return (string) $this->get('credit_use_api_redirect', 'Survey', $surveyId, '0') === '1';
     }
 
     /**
@@ -345,7 +331,7 @@ class SurveyCreditPay extends PluginBase
                     return (string) $response->token;
                 }
             } catch (Throwable $e) {
-                $this->log(sprintf('Failed to resolve token from response: %s', $e->getMessage()), \CLogger::LEVEL_WARNING);
+                $this->logPlugin($surveyId.":".$responseId, sprintf('Failed to resolve token from response: %s', $e->getMessage()), \CLogger::LEVEL_WARNING);
             }
         }
 
@@ -378,6 +364,7 @@ class SurveyCreditPay extends PluginBase
             ];
         }
 
+        $this->logPlugin($payload['sid'].":".$payload['token'], sprintf('Calling credit API. url=%s payload=%s', $apiUrl, json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)));
         $body = http_build_query($payload, '', '&');
 
         curl_setopt_array($ch, [
@@ -446,6 +433,7 @@ class SurveyCreditPay extends PluginBase
     private function applyRedirect(string $url, string $reason): void
     {
         if ($reason === 'screenout') {
+            $this->logPlugin('screenout', sprintf('Redirecting to survey %s.', $url));
             $event = $this->getEvent();
             $event->set('url', $url);
             $event->set('urldescrip', $url);
@@ -454,6 +442,7 @@ class SurveyCreditPay extends PluginBase
             return;
         }
 
+        $this->logPlugin('redirect', sprintf('Redirecting to survey %s via script.', $url));
         $this->appendRedirectScript($url);
     }
 
@@ -496,13 +485,13 @@ HTML;
         }
 
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
-            $this->log(sprintf('Invalid redirect URL from API: %s', $url), \CLogger::LEVEL_WARNING);
+            $this->logPlugin("sanitize",sprintf('Invalid redirect URL from API: %s', $url), \CLogger::LEVEL_WARNING);
             return null;
         }
 
         $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
         if (!in_array($scheme, ['http', 'https'], true)) {
-            $this->log(sprintf('Rejected redirect URL due to unsupported scheme: %s', $url), \CLogger::LEVEL_WARNING);
+            $this->logPlugin("sanitize", sprintf('Rejected redirect URL due to unsupported scheme: %s', $url), \CLogger::LEVEL_WARNING);
             return null;
         }
 
@@ -537,5 +526,10 @@ HTML;
     private function buildProcessMarkerKey(int $surveyId, int $responseId, string $reason): string
     {
         return $surveyId . ':' . $responseId . ':' . $reason;
+    }
+
+    private function logPlugin($identy, string $message, $level =\CLogger::LEVEL_INFO): void {
+        $prefix = sprintf('[%s][sid: %s]', "SurveyCreditPay", $identy);
+        $this->log($prefix. $message, $level);
     }
 }
