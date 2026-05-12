@@ -15,7 +15,7 @@
  * @method log($message, $level = \CLogger::LEVEL_TRACE)
  * @method set(string $key, mixed $data, string|null $model, int|null $id)
  * @method getEvent() PluginEvent
- * @methid gT(string $message) string
+ * @methid $this->gT(string $message) string
  *
  * @property PluginEvent|null $event
  * @property int|null $id
@@ -96,44 +96,52 @@ class SurveyCreditPay extends PluginBase
         $event->set("surveysettings.{$this->id}", [
             'name' => get_class($this),
             'settings' => [
+                'api_info' => [
+                    'type' => 'info',
+                    'content' => $this->gT('Configure the reward amounts and callback behavior for this survey. The API URL and key are set in the global plugin settings.'),
+                ],
+                'api_settings' => [
+                    'type' => 'info',
+                    'content' => sprintf('Url: %s<br>Key: %s', CHtml::encode($this->get('api_url', null, null, self::DEFAULT_API_URL)), str_repeat('*', max(8, strlen($this->get('api_key', null, null, self::DEFAULT_API_KEY))))),
+                ],
                 'credit_completed_amount' => [
                     'type' => 'string',
-                    'label' => gT('Reward for completed interview'),
+                    'label' => $this->gT('Reward for completed interview'),
                     'current' => $this->get('credit_completed_amount', 'Survey', $surveyId),
-                    'help' => gT('Numeric amount to send as result for completed interviews.'),
+                    'help' => $this->gT('Numeric amount to send as result for completed interviews.'),
                     'htmlOptions' => [
                         'placeholder' => '20',
                     ],
                 ],
                 'credit_screenout_amount' => [
                     'type' => 'string',
-                    'label' => gT('Reward for screenout'),
+                    'label' => $this->gT('Reward for screenout'),
                     'current' => $this->get('credit_screenout_amount', 'Survey', $surveyId),
-                    'help' => gT('Numeric amount to send as result for quota screenouts.'),
+                    'help' => $this->gT('Numeric amount to send as result for quota screenouts.'),
                     'htmlOptions' => [
                         'placeholder' => '5',
                     ],
                 ],
                 'credit_enabled' => [
                     'type' => 'select',
-                    'label' => gT('Enable credit callback'),
+                    'label' => $this->gT('Enable credit callback'),
                     'current' => (string) $this->get('credit_enabled', 'Survey', $surveyId, '0'),
                     'default' => '0',
                     'options' => [
-                        '0' => gT('Disabled'),
-                        '1' => gT('Enabled',)
+                        '0' => $this->gT('Disabled'),
+                        '1' => $this->gT('Enabled',)
                     ],
                 ],
                 'credit_use_api_redirect' => [
                     'type' => 'select',
-                    'label' => gT('Use redirect link from external API'),
+                    'label' => $this->gT('Use redirect link from external API'),
                     'current' => (string) $this->get('credit_use_api_redirect', 'Survey', $surveyId, '0'),
                     'default' => '0',
                     'options' => [
-                        '0' => gT('No'),
-                        '1' => gT('Yes'),
+                        '0' => $this->gT('No'),
+                        '1' => $this->gT('Yes'),
                     ],
-                    'help' => gT('If enabled and the API returns a non-empty link, the participant will be redirected there.'),
+                    'help' => $this->gT('If enabled and the API returns a non-empty link, the participant will be redirected there.'),
                 ],
             ],
         ]);
@@ -197,7 +205,7 @@ class SurveyCreditPay extends PluginBase
 
         $amount = $this->getAmountForReason($surveyId, $reason);
         if ($amount === null) {
-            $this->appendUserWarning($this->buildUserErrorMessage(gT('invalid reward amount in plugin settings')));
+            $this->appendUserWarning($this->buildUserErrorMessage($this->gT('invalid reward amount in plugin settings')));
             return;
         }
 
@@ -358,7 +366,7 @@ class SurveyCreditPay extends PluginBase
         if ($apiUrl === '') {
             return [
                 'ok' => false,
-                'error' => gT('API URL is empty in plugin global settings.'),
+                'error' => $this->gT('API URL is empty in plugin global settings.'),
             ];
         }
 
@@ -366,7 +374,7 @@ class SurveyCreditPay extends PluginBase
         if ($ch === false) {
             return [
                 'ok' => false,
-                'error' => gT('Unable to initialize cURL.'),
+                'error' => $this->gT('Unable to initialize cURL.'),
             ];
         }
 
