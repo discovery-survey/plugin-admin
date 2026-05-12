@@ -209,10 +209,11 @@ class SurveyCreditPay extends PluginBase
             'ts' => time(),
         ];
 
+        $logIdenty = $surveyId.":".$responseId.":".$payload['token'];
         $apiResult = $this->callCreditApi($payload);
         if (!$apiResult['ok']) {
             $this->logPlugin(
-                $surveyId.":".$responseId,
+                $logIdenty,
                 sprintf(
                     'Credit API error. survey=%d response=%d reason=%s error=%s',
                     $surveyId,
@@ -227,11 +228,11 @@ class SurveyCreditPay extends PluginBase
             return;
         }
 
-        $this->logPlugin($surveyId, sprintf('Credit API call successful. survey=%d response=%d reason=%s amount=%s', $surveyId, $responseId, $reason, $amount));
+        $this->logPlugin($logIdenty, sprintf('Credit API call successful. survey=%d response=%d reason=%s amount=%s', $surveyId, $responseId, $reason, $amount));
         $this->markProcessed($surveyId, $responseId, $reason);
 
         $this->logPlugin(
-            $surveyId.":".$responseId,
+            $logIdenty,
             sprintf(
                 'Credit callback success. survey=%d response=%d reason=%s payload=%s response=%s',
                 $surveyId,
@@ -529,7 +530,7 @@ HTML;
     }
 
     private function logPlugin($identy, string $message, $level =\CLogger::LEVEL_INFO): void {
-        $prefix = sprintf('[%s][sid: %s]', "SurveyCreditPay", $identy);
+        $prefix = sprintf('[sid: %s] ', $identy);
         $this->log($prefix. $message, $level);
     }
 }

@@ -7,7 +7,7 @@
     <lastUpdate>2026-05-12</lastUpdate>
     <author>Valentin Nikolaev</author>
     <authorUrl>https://github.com/ValentinNikolaev</authorUrl>
-    <version>1.0.6</version>
+    <version>1.0.7</version>
     <license>GNU General Public License version 2 or later</license>
     <description><![CDATA[Calls an external credit API on survey complete or quota screenout, with per-survey rewards and optional redirect.]]></description>
   </metadata>
