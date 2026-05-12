@@ -1,0 +1,110 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: SurveyCreditPay 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-12 00:00+0200\n"
+"PO-Revision-Date: 2026-05-12 00:00+0200\n"
+"Last-Translator: \n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: ChatGPT\n"
+"X-Domain: SurveyCreditPay\n"
+
+msgid "SurveyCreditPay"
+msgstr "SurveyCreditPay"
+
+msgid "Credits participants on complete or screenout and can redirect to an external link."
+msgstr "Начисляет участникам вознаграждение при завершении опроса или screenout и может перенаправлять на внешнюю ссылку."
+
+msgid "Credit API URL"
+msgstr "URL API для начисления вознаграждения"
+
+msgid "Global endpoint used for the invisible server-side callback."
+msgstr "Глобальный endpoint, используемый для скрытого серверного callback-запроса."
+
+msgid "API key"
+msgstr "API-ключ"
+
+msgid "Will be sent in the X-API-KEY header."
+msgstr "Будет отправлен в заголовке X-API-KEY."
+
+msgid "Fallback token"
+msgstr "Резервный токен"
+
+msgid "Used when the survey token cannot be resolved from session/response."
+msgstr "Используется, если токен опроса не удалось получить из сессии или ответа."
+
+msgid "HTTP timeout (seconds)"
+msgstr "HTTP timeout (секунды)"
+
+msgid "Total request timeout for the credit API call."
+msgstr "Общий timeout запроса к API начисления вознаграждения."
+
+msgid "Connect timeout (seconds)"
+msgstr "Connect timeout (секунды)"
+
+msgid "Connection timeout for the credit API call."
+msgstr "Timeout подключения к API начисления вознаграждения."
+
+msgid "User-facing error message prefix"
+msgstr "Префикс сообщения об ошибке для пользователя"
+
+msgid "The plugin appends the technical error after this text."
+msgstr "Плагин добавляет техническую ошибку после этого текста."
+
+msgid "Reward for completed interview"
+msgstr "Вознаграждение за завершённое интервью"
+
+msgid "Numeric amount to send as result for completed interviews."
+msgstr "Числовое значение, которое будет отправлено как результат для завершённых интервью."
+
+msgid "Reward for screenout"
+msgstr "Вознаграждение за screenout"
+
+msgid "Numeric amount to send as result for quota screenouts."
+msgstr "Числовое значение, которое будет отправлено как результат для quota screenout."
+
+msgid "Enable credit callback"
+msgstr "Включить callback начисления вознаграждения"
+
+msgid "Disabled"
+msgstr "Выключено"
+
+msgid "Enabled"
+msgstr "Включено"
+
+msgid "Use redirect link from external API"
+msgstr "Использовать ссылку перенаправления из внешнего API"
+
+msgid "No"
+msgstr "Нет"
+
+msgid "Yes"
+msgstr "Да"
+
+msgid "If enabled and the API returns a non-empty link, the participant will be redirected there."
+msgstr "Если включено и API вернёт непустую ссылку, участник будет перенаправлен по этой ссылке."
+
+msgid "invalid reward amount in plugin settings"
+msgstr "некорректная сумма вознаграждения в настройках плагина"
+
+msgid "API URL is empty in plugin global settings."
+msgstr "URL API не указан в глобальных настройках плагина."
+
+msgid "Unable to initialize cURL."
+msgstr "Не удалось инициализировать cURL."
+
+msgid "Unknown API error."
+msgstr "Неизвестная ошибка API."
+
+msgid "Continue"
+msgstr "Продолжить"
+
+msgid "Не удалось зачислить деньги, обратитесь к администратору."
+msgstr "Не удалось зачислить деньги, обратитесь к администратору."
+
+msgid "Укажите ошибку: "
+msgstr "Укажите ошибку: "

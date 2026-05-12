@@ -110,3 +110,9 @@ SurveyCreditPay/
 - Replace the ngrok URL with your stable production endpoint.
 - Consider lowering the text of the technical error shown to end users if you do not want API/internal details displayed.
 - Check `tmp/runtime/plugin.log` for plugin logs.
+
+
+## Compile
+```aiignore
+msgfmt ru.po -o ru.mo
+```

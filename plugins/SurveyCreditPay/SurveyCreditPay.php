@@ -15,6 +15,7 @@
  * @method log($message, $level = \CLogger::LEVEL_TRACE)
  * @method set(string $key, mixed $data, string|null $model, int|null $id)
  * @method getEvent() PluginEvent
+ * @methid gT(string $message) string
  *
  * @property PluginEvent|null $event
  * @property int|null $id
@@ -97,42 +98,42 @@ class SurveyCreditPay extends PluginBase
             'settings' => [
                 'credit_completed_amount' => [
                     'type' => 'string',
-                    'label' => 'Reward for completed interview',
+                    'label' => gT('Reward for completed interview'),
                     'current' => $this->get('credit_completed_amount', 'Survey', $surveyId),
-                    'help' => 'Numeric amount to send as result for completed interviews.',
+                    'help' => gT('Numeric amount to send as result for completed interviews.'),
                     'htmlOptions' => [
                         'placeholder' => '20',
                     ],
                 ],
                 'credit_screenout_amount' => [
                     'type' => 'string',
-                    'label' => 'Reward for screenout',
+                    'label' => gT('Reward for screenout'),
                     'current' => $this->get('credit_screenout_amount', 'Survey', $surveyId),
-                    'help' => 'Numeric amount to send as result for quota screenouts.',
+                    'help' => gT('Numeric amount to send as result for quota screenouts.'),
                     'htmlOptions' => [
                         'placeholder' => '5',
                     ],
                 ],
                 'credit_enabled' => [
                     'type' => 'select',
-                    'label' => 'Enable credit callback',
+                    'label' => gT('Enable credit callback'),
                     'current' => (string) $this->get('credit_enabled', 'Survey', $surveyId, '0'),
                     'default' => '0',
                     'options' => [
-                        '0' => 'Disabled',
-                        '1' => 'Enabled',
+                        '0' => gT('Disabled'),
+                        '1' => gT('Enabled',)
                     ],
                 ],
                 'credit_use_api_redirect' => [
                     'type' => 'select',
-                    'label' => 'Use redirect link from external API',
+                    'label' => gT('Use redirect link from external API'),
                     'current' => (string) $this->get('credit_use_api_redirect', 'Survey', $surveyId, '0'),
                     'default' => '0',
                     'options' => [
-                        '0' => 'No',
-                        '1' => 'Yes',
+                        '0' => gT('No'),
+                        '1' => gT('Yes'),
                     ],
-                    'help' => 'If enabled and the API returns a non-empty link, the participant will be redirected there.',
+                    'help' => gT('If enabled and the API returns a non-empty link, the participant will be redirected there.'),
                 ],
             ],
         ]);
@@ -196,7 +197,7 @@ class SurveyCreditPay extends PluginBase
 
         $amount = $this->getAmountForReason($surveyId, $reason);
         if ($amount === null) {
-            $this->appendUserWarning($this->buildUserErrorMessage('invalid reward amount in plugin settings'));
+            $this->appendUserWarning($this->buildUserErrorMessage(gT('invalid reward amount in plugin settings')));
             return;
         }
 
@@ -357,7 +358,7 @@ class SurveyCreditPay extends PluginBase
         if ($apiUrl === '') {
             return [
                 'ok' => false,
-                'error' => 'API URL is empty in plugin global settings.',
+                'error' => gT('API URL is empty in plugin global settings.'),
             ];
         }
 
@@ -365,7 +366,7 @@ class SurveyCreditPay extends PluginBase
         if ($ch === false) {
             return [
                 'ok' => false,
-                'error' => 'Unable to initialize cURL.',
+                'error' => gT('Unable to initialize cURL.'),
             ];
         }
 
