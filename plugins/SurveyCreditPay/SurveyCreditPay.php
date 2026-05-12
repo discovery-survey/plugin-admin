@@ -21,13 +21,13 @@
  */
 class SurveyCreditPay extends PluginBase
 {
-    protected string $storage = 'DbStorage';
+    protected $storage = 'DbStorage';
 
     protected static string $name = 'SurveyCreditPay';
     protected static string $description = 'Credits participants on complete or screenout and can redirect to an external link.';
 
     /** @var array<string,mixed> */
-    protected array $settings = [
+    protected $settings = [
         'api_url' => [
             'type' => 'string',
             'label' => 'Credit API URL',
@@ -67,7 +67,7 @@ class SurveyCreditPay extends PluginBase
     ];
 
     /** @inheritdoc */
-    public array $allowedPublicMethods = [];
+    public $allowedPublicMethods = [];
 
     private const DEFAULT_API_URL = 'https://1ca4-176-105-209-237.ngrok-free.app/api/credit';
     private const DEFAULT_API_KEY = 'jdkbvndfvfj43rvvvVVDSVEWASAqwewe43232edsfr5dvSDVDrtsfS__Dsddsd';
