@@ -201,13 +201,27 @@ class SurveyCreditPay extends PluginBase
             return;
         }
 
+
         $payload = [
-            'token' => $this->resolveToken($surveyId, $responseId),
             'sid' => $surveyId,
             'result' => $amount,
             'reason' => $reason,
             'ts' => time(),
         ];
+
+        $token = $this->resolveToken($surveyId, $responseId);
+        $token = trim(strtolower($token));
+
+        if (strpos($token, 'openlink') !== false) {
+            $payload['openlink'] = $token;
+        } else {
+            $intToken = (int) $token;
+            if ($intToken <= 0 || (string)$intToken !== $token) {
+                $this->logPlugin($surveyId.":".$responseId, sprintf('Invalid token resolved: %s', $token), \CLogger::LEVEL_ERROR);
+                return;
+            }
+            $payload['token'] = $token;
+        }
 
         $logIdenty = $surveyId.":".$responseId.":".$payload['token'];
         $apiResult = $this->callCreditApi($payload);
@@ -357,7 +371,11 @@ class SurveyCreditPay extends PluginBase
             ];
         }
 
-        $ch = curl_init($apiUrl);
+        // Добавляем параметры в URL
+        $queryString = http_build_query($payload, '', '&');
+        $fullUrl = $apiUrl . '?' . $queryString;
+
+        $ch = curl_init($fullUrl);
         if ($ch === false) {
             return [
                 'ok' => false,
@@ -365,12 +383,10 @@ class SurveyCreditPay extends PluginBase
             ];
         }
 
-        $this->logPlugin($payload['sid'].":".$payload['token'], sprintf('Calling credit API. url=%s payload=%s', $apiUrl, json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)));
-        $body = http_build_query($payload, '', '&');
+        $this->logPlugin($payload['sid'].":".$payload['token'], sprintf('Calling credit API. url=%s', $fullUrl));
 
         curl_setopt_array($ch, [
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => $body,
+            CURLOPT_POST => false,  // Отключаем POST
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => false,
             CURLOPT_TIMEOUT => max(1, $httpTimeout),
@@ -379,7 +395,6 @@ class SurveyCreditPay extends PluginBase
             CURLOPT_HTTPHEADER => [
                 'X-API-KEY: ' . $apiKey,
                 'Accept: application/json',
-                'Content-Type: application/x-www-form-urlencoded',
             ],
         ]);
 
