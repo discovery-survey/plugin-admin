@@ -454,12 +454,12 @@ class SurveyCreditPay extends PluginBase
             $event->set('url', $url);
             $event->set('urldescrip', $url);
             $event->set('autoloadurl', '1');
-            $this->appendRedirectScript($url);
+            $this->appendRedirectHeader($url);
             return;
         }
 
         $this->logPlugin('redirect', sprintf('Redirecting to survey %s via script.', $url));
-        $this->appendRedirectScript($url);
+        $this->appendRedirectHeader($url);
     }
 
     private function appendUserWarning(string $message): void
@@ -467,6 +467,12 @@ class SurveyCreditPay extends PluginBase
         $content = $this->getEvent()->getContent($this);
         $html = '<div class="alert alert-danger" role="alert" style="margin-top:15px;">' . $message . '</div>';
         $content->addContent($html);
+    }
+
+    private function appendRedirectHeader(string $url): void {
+        $this->logPlugin('redirect', sprintf('Redirecting to %s.', $url));
+        header('Location: ' . $url, true, 302);
+        exit();
     }
 
     private function appendRedirectScript(string $url): void
