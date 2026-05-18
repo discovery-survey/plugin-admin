@@ -8,7 +8,7 @@
  *
  */
 
-use Relay\Event;
+use \LimeSurvey\PluginManager\PluginEvent;
 
 /**
  *
