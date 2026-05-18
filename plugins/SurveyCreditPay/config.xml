@@ -4,10 +4,10 @@
     <name>SurveyCreditPay</name>
     <type>plugin</type>
     <creationDate>2026-03-29</creationDate>
-    <lastUpdate>2026-05-14</lastUpdate>
+    <lastUpdate>2026-05-18</lastUpdate>
     <author>Valentin Nikolaev</author>
     <authorUrl>https://github.com/discovery-survey/plugin-admin/tree/main/plugins/SurveyCreditPay</authorUrl>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
     <license>GNU General Public License version 2 or later</license>
     <description><![CDATA[Calls an external credit API on survey complete or quota screenout, with per-survey rewards and optional redirect.]]></description>
   </metadata>
