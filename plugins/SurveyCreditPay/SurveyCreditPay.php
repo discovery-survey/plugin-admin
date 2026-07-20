@@ -43,6 +43,12 @@ class SurveyCreditPay extends PluginBase
             'default' => 'jdkbvndfvfj43rvvvVVDSVEWASAqwewe43232edsfr5dvSDVDrtsfS__Dsddsd',
             'help' => 'Will be sent in the X-API-KEY header.',
         ],
+        'redirect_bot' => [
+            'type' => 'string',
+            'label' => 'Landing bot URL',
+            'default' => '',
+            'help' => 'URL of the Telegram landing bot to redirect users to (e.g. https://bot.discovery-survey.com/). Combined with the "start" field returned by the API.',
+        ],
         'token_fallback' => [
             'type' => 'string',
             'label' => 'Fallback token',
@@ -74,6 +80,7 @@ class SurveyCreditPay extends PluginBase
 
     private const DEFAULT_API_URL = 'https://1ca4-176-105-209-237.ngrok-free.app/api/credit';
     private const DEFAULT_API_KEY = 'jdkbvndfvfj43rvvvVVDSVEWASAqwewe43232edsfr5dvSDVDrtsfS__Dsddsd';
+    private const DEFAULT_REDIRECT_BOT = '';
     private const DEFAULT_TOKEN_FALLBACK = '00000000';
     private const DEFAULT_HTTP_TIMEOUT = 10;
     private const DEFAULT_CONNECT_TIMEOUT = 5;
@@ -110,15 +117,6 @@ class SurveyCreditPay extends PluginBase
                     'options' => [
                         '0' => $this->gT('Disabled'),
                         '1' => $this->gT('Enabled',)
-                    ],
-                ],
-                'redirect_bot' => [
-                    'type' => 'string',
-                    'label' => $this->gT('Landing bot URL'),
-                    'current' => $this->get('redirect_bot', 'Survey', $surveyId),
-                    'help' => $this->gT('URL of the Telegram landing bot to redirect users to.'),
-                    'htmlOptions' => [
-                        'placeholder' => 'https://bot.discovery-survey.com/',
                     ],
                 ],
                 'api_settings' => [
@@ -158,7 +156,6 @@ class SurveyCreditPay extends PluginBase
 
         $keys = [
             'credit_enabled',
-            'redirect_bot',
             'credit_completed_amount',
             'credit_screenout_amount',
         ];
@@ -269,13 +266,12 @@ class SurveyCreditPay extends PluginBase
 
         $data = is_array($apiResult['data'] ?? null) ? $apiResult['data'] : [];
 
-        $redirectBot = trim((string) $this->get('redirect_bot', 'Survey', $surveyId, ''));
+        $redirectBot = trim((string) $this->get('redirect_bot', null, null, self::DEFAULT_REDIRECT_BOT));
         $start = isset($data['start']) ? trim((string) $data['start']) : '';
 
         if ($redirectBot !== '' && $start !== '') {
-            $base = ltrim($redirectBot, '\\');
-            $separator = strpos($base, '?') === false ? '?' : '&';
-            $redirectUrl = $this->sanitizeRedirectUrl($base . $separator . 'start=' . rawurlencode($start));
+            $separator = strpos($redirectBot, '?') === false ? '?' : '&';
+            $redirectUrl = $this->sanitizeRedirectUrl($redirectBot . $separator . 'start=' . rawurlencode($start));
         } else {
             $redirectUrl = $this->sanitizeRedirectUrl((string) ($data['link'] ?? ''));
         }
