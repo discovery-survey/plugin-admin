@@ -112,6 +112,15 @@ class SurveyCreditPay extends PluginBase
                         '1' => $this->gT('Enabled',)
                     ],
                 ],
+                'redirect_bot' => [
+                    'type' => 'string',
+                    'label' => $this->gT('Landing bot URL'),
+                    'current' => $this->get('redirect_bot', 'Survey', $surveyId),
+                    'help' => $this->gT('URL of the Telegram landing bot to redirect users to.'),
+                    'htmlOptions' => [
+                        'placeholder' => 'https://bot.discovery-survey.com/',
+                    ],
+                ],
                 'api_settings' => [
                     'type' => 'info',
                     'content' => sprintf('Url: %s<br>Key: %s', CHtml::encode($this->get('api_url', null, null, self::DEFAULT_API_URL)), str_repeat('*', max(8, strlen($this->get('api_key', null, null, self::DEFAULT_API_KEY))))),
@@ -149,6 +158,7 @@ class SurveyCreditPay extends PluginBase
 
         $keys = [
             'credit_enabled',
+            'redirect_bot',
             'credit_completed_amount',
             'credit_screenout_amount',
         ];
@@ -257,7 +267,19 @@ class SurveyCreditPay extends PluginBase
             )
         );
 
-        $redirectUrl = $this->sanitizeRedirectUrl((string) ($apiResult['data']['link'] ?? ''));
+        $data = is_array($apiResult['data'] ?? null) ? $apiResult['data'] : [];
+
+        $redirectBot = trim((string) $this->get('redirect_bot', 'Survey', $surveyId, ''));
+        $start = isset($data['start']) ? trim((string) $data['start']) : '';
+
+        if ($redirectBot !== '' && $start !== '') {
+            $base = ltrim($redirectBot, '\\');
+            $separator = strpos($base, '?') === false ? '?' : '&';
+            $redirectUrl = $this->sanitizeRedirectUrl($base . $separator . 'start=' . rawurlencode($start));
+        } else {
+            $redirectUrl = $this->sanitizeRedirectUrl((string) ($data['link'] ?? ''));
+        }
+
         if ($redirectUrl === null) {
             return;
         }
