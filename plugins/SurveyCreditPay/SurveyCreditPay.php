@@ -47,7 +47,7 @@ class SurveyCreditPay extends PluginBase
             'type' => 'string',
             'label' => 'Landing bot URL',
             'default' => '',
-            'help' => 'URL of the Telegram landing bot to redirect users to (e.g. https://bot.discovery-survey.com/). Combined with the "start" field returned by the API.',
+            'help' => 'URL of the Telegram landing bot to redirect users to (e.g. https://bot.discovery-survey.com/?test=1). Existing query parameters are preserved and combined with the "start" field returned by the API.',
         ],
         'token_fallback' => [
             'type' => 'string',
@@ -270,8 +270,7 @@ class SurveyCreditPay extends PluginBase
         $start = isset($data['start']) ? trim((string) $data['start']) : '';
 
         if ($redirectBot !== '' && $start !== '') {
-            $separator = strpos($redirectBot, '?') === false ? '?' : '&';
-            $redirectUrl = $this->sanitizeRedirectUrl($redirectBot . $separator . 'start=' . rawurlencode($start));
+            $redirectUrl = $this->sanitizeRedirectUrl($this->appendQueryParameter($redirectBot, 'start', $start));
         } else {
             $redirectUrl = $this->sanitizeRedirectUrl((string) ($data['link'] ?? ''));
         }
@@ -281,6 +280,27 @@ class SurveyCreditPay extends PluginBase
         }
 
         $this->applyRedirect($redirectUrl, $reason);
+    }
+
+    private function appendQueryParameter(string $url, string $name, string $value): string
+    {
+        $fragment = '';
+        $fragmentPosition = strpos($url, '#');
+
+        if ($fragmentPosition !== false) {
+            $fragment = substr($url, $fragmentPosition);
+            $url = substr($url, 0, $fragmentPosition);
+        }
+
+        if (strpos($url, '?') === false) {
+            $separator = '?';
+        } elseif (substr($url, -1) === '?' || substr($url, -1) === '&') {
+            $separator = '';
+        } else {
+            $separator = '&';
+        }
+
+        return $url . $separator . rawurlencode($name) . '=' . rawurlencode($value) . $fragment;
     }
 
     private function isEnabledForSurvey(int $surveyId): bool
